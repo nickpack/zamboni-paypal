@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import date
 from decimal import Decimal, InvalidOperation
 import urllib
 import urlparse
@@ -9,15 +8,17 @@ from django.conf import settings
 from django.utils.http import urlquote
 
 import commonware.log
-from django_statsd.clients import statsd
 from paypalx.getPermissionsAuthHeader import getAuthHeader as get_auth_header
 import requests
 
-import amo
-from amo.helpers import absolutify, urlparams
-from amo.urlresolvers import reverse
-from amo.utils import log_cef
-from tower import ugettext as _
+from helpers import absolutify, urlparams
+from urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 
 
 class PaypalError(Exception):
@@ -546,7 +547,7 @@ def check_paypal_id(name):
 
 
 def paypal_log_cef(request, addon, uuid, msg, caps, longer):
-    log_cef('Paypal %s' % msg, 5, request,
+    logger('Paypal %s' % msg, 5, request,
             username=request.amo_user,
             signature='PAYPAL%s' % caps,
             msg=longer, cs2=addon.name, cs2Label='PaypalTransaction',
